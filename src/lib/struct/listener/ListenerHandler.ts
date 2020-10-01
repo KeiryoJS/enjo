@@ -5,7 +5,11 @@
  */
 
 import { mergeObjects } from "@neocord/utils";
-import { ComponentHandler, ComponentResolvable, HandlerOptions } from "../Handler";
+import {
+  ComponentHandler,
+  ComponentResolvable,
+  HandlerOptions,
+} from "../Handler";
 import { Listener } from "./Listener";
 
 import type { Enjo } from "../../Client";
@@ -24,13 +28,13 @@ export class ListenerHandler extends ComponentHandler<Listener> {
   public constructor(client: Enjo, options: ListenerHandlerOptions) {
     super(client, "listeners", {
       class: Listener,
-      ...options
+      ...options,
     });
 
     this.emitters = options.emitters ?? {
       client,
       listeners: this,
-      process
+      process,
     };
   }
 
@@ -41,9 +45,7 @@ export class ListenerHandler extends ComponentHandler<Listener> {
    * @returns {this}
    */
   public setEmitters(dict: Dictionary<EventEmitterLike>, merge = false): this {
-    this.emitters = merge
-      ? mergeObjects(this.emitters, dict)
-      : dict;
+    this.emitters = merge ? mergeObjects(this.emitters, dict) : dict;
 
     return this;
   }
@@ -54,7 +56,10 @@ export class ListenerHandler extends ComponentHandler<Listener> {
    * @param {boolean} emit Whether to emit the "removed" event.
    * @returns {?Listener}
    */
-  public remove(resolvable: ComponentResolvable<Listener>, emit?: boolean): Listener | null {
+  public remove(
+    resolvable: ComponentResolvable<Listener>,
+    emit?: boolean
+  ): Listener | null {
     const listener = super.remove(resolvable, emit);
     if (listener) listener._remove();
     return listener;

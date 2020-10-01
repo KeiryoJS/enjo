@@ -10,7 +10,9 @@ import { join } from "path";
 import type { Enjo } from "../Client";
 import type { ComponentHandler } from "./Handler";
 
-export class EnjoComponent<O extends ComponentOptions = ComponentOptions> extends Base {
+export class EnjoComponent<
+  O extends ComponentOptions = ComponentOptions
+> extends Base {
   /**
    * The options for this component
    * @type {ComponentOptions}
@@ -48,8 +50,7 @@ export class EnjoComponent<O extends ComponentOptions = ComponentOptions> extend
   public constructor(client: Enjo, options: O) {
     super(client);
 
-    if (options.id)
-      this.id = options.id;
+    if (options.id) this.id = options.id;
 
     this.options = options;
 

@@ -63,7 +63,7 @@ export class RatelimitController {
     if (!entry) {
       entry = {
         reset: command.ratelimit.reset as number,
-        remaining: Number(command.ratelimit.bucket)
+        remaining: Number(command.ratelimit.bucket),
       };
 
       entry.timeout = Timers.setTimeout(() => {

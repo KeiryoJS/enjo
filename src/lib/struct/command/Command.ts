@@ -16,14 +16,14 @@ const RATELIMIT_REGEXP = /^(?:((?:ch(?:annel)?|use?r|guild)):)?(\d+)\/(\d+)(m?s?
 const RATELIMIT_DEFAULTS: RatelimitOptions = {
   reset: 5000,
   bucket: 1,
-  type: "user"
+  type: "user",
 };
 
 const PERMISSION_DEFAULTS: CommandPermissions = {
   botOwner: false,
   client: [],
   guildOwner: false,
-  invoker: []
+  invoker: [],
 };
 
 const COMMAND_DEFAULTS = {
@@ -34,7 +34,7 @@ const COMMAND_DEFAULTS = {
   description: "No description provided.",
   permissions: PERMISSION_DEFAULTS,
   examples: [],
-  usage: ""
+  usage: "",
 };
 
 export class Command extends EnjoComponent<CommandOptions> {
@@ -73,7 +73,10 @@ export class Command extends EnjoComponent<CommandOptions> {
     this.triggers = options.triggers ?? [];
     this.typing = options.typing ?? true;
     this.channel = options.channel;
-    this.permissions = mergeObjects(options.permissions ?? {}, PERMISSION_DEFAULTS);
+    this.permissions = mergeObjects(
+      options.permissions ?? {},
+      PERMISSION_DEFAULTS
+    );
   }
 
   /**
@@ -85,11 +88,11 @@ export class Command extends EnjoComponent<CommandOptions> {
       const r = RATELIMIT_REGEXP.exec(this.options.ratelimit);
       if (!r) return RATELIMIT_DEFAULTS;
 
-      const [ , type, bucket, reset, unit ] = r;
+      const [, type, bucket, reset, unit] = r;
       return {
         bucket: +(bucket ?? 1),
         type: type as RatelimitType,
-        reset: unit ? Duration.parse(`${reset}${unit}`) : +(reset ?? 5000)
+        reset: unit ? Duration.parse(`${reset}${unit}`) : +(reset ?? 5000),
       };
     }
 
@@ -114,7 +117,10 @@ export type MissingPermissionResolver = (ctx: Context) => null | unknown;
 
 export type ChannelType = "guild" | "dm";
 
-export type RatelimitType = ("ch" | "channel") | ("usr" | "user") | ("g" | "guild");
+export type RatelimitType =
+  | ("ch" | "channel")
+  | ("usr" | "user")
+  | ("g" | "guild");
 
 export interface RatelimitOptions {
   /**

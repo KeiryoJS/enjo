@@ -17,7 +17,7 @@ const DEFAULTS: DispatcherOptions = {
   defaultRatelimit: "user:1/5s",
   mentionPrefix: true,
   passive: false,
-  prefix: "!"
+  prefix: "!",
 };
 
 export class CommandDispatcher {
@@ -134,12 +134,14 @@ export class CommandDispatcher {
     if (!prefix) return;
 
     // (3) Parse arguments.
-    const [ invoke, ...args ] = message.content
+    const [invoke, ...args] = message.content
       .slice(prefix.length)
       .trim()
       .split(/\s/g);
 
-    const command = this.#handler.store.find(c => c.triggers.includes(invoke));
+    const command = this.#handler.store.find((c) =>
+      c.triggers.includes(invoke)
+    );
     if (!command) {
       this.#handler.emit("commandNotFound", ctx, invoke);
       return;
@@ -153,8 +155,7 @@ export class CommandDispatcher {
 
     // (5) Start Typing.
     if (command.typing) {
-      message.channel.typing.start()
-        .then(() => void 0);
+      message.channel.typing.start().then(() => void 0);
     }
 
     try {
@@ -171,20 +172,35 @@ export class CommandDispatcher {
     }
   }
 
-  private async _runConditions(ctx: Context, command: Command): Promise<boolean> {
+  private async _runConditions(
+    ctx: Context,
+    command: Command
+  ): Promise<boolean> {
     if (!this.client.owners.has(ctx.author)) {
       // (0) Run Rate-limits.
       const dripRes = await this.ratelimit.drip(ctx.message, command);
       if (typeof dripRes === "number") {
-        const target = RatelimitController.getRatelimitTarget(ctx.message, command.ratelimit);
+        const target = RatelimitController.getRatelimitTarget(
+          ctx.message,
+          command.ratelimit
+        );
         this.#handler.emit("ratelimited", ctx, command, dripRes, target);
         return false;
       }
     }
 
     // (1) Check channel type.
-    if ((command.channel === "guild" && !ctx.guild) || (command.channel === "dm" && ctx.guild)) {
-      this.#handler.emit("commandBlocked", ctx, command, "channel", command.channel);
+    if (
+      (command.channel === "guild" && !ctx.guild) ||
+      (command.channel === "dm" && ctx.guild)
+    ) {
+      this.#handler.emit(
+        "commandBlocked",
+        ctx,
+        command,
+        "channel",
+        command.channel
+      );
       return false;
     }
 
@@ -199,7 +215,11 @@ export class CommandDispatcher {
         return false;
       }
 
-      if (ctx.guild && (command.permissions.guildOwner && ctx.member?.id !== ctx.guild.ownerId)) {
+      if (
+        ctx.guild &&
+        command.permissions.guildOwner &&
+        ctx.member?.id !== ctx.guild.ownerId
+      ) {
         this.#handler.emit("commandBlocked", ctx, command, "guildOwner");
         return false;
       }
@@ -209,15 +229,30 @@ export class CommandDispatcher {
           let missing = command.permissions.invoker(ctx);
           if (isPromise(missing)) missing = await missing;
           if (missing != null) {
-            this.#handler.emit("missingPermissions", ctx, command, "invoker", missing);
+            this.#handler.emit(
+              "missingPermissions",
+              ctx,
+              command,
+              "invoker",
+              missing
+            );
+
             return false;
           }
         } else if (ctx.guild) {
-          const missing = ctx.member?.permissionsIn(channel)
+          const missing = ctx.member
+            ?.permissionsIn(channel)
             .missing(command.permissions.invoker);
 
           if (missing?.length) {
-            this.#handler.emit("missingPermissions", ctx, command, "invoker", missing);
+            this.#handler.emit(
+              "missingPermissions",
+              ctx,
+              command,
+              "invoker",
+              missing
+            );
+
             return false;
           }
         }
@@ -229,15 +264,30 @@ export class CommandDispatcher {
         let missing = command.permissions.client(ctx);
         if (isPromise(missing)) missing = await missing;
         if (missing != null) {
-          this.#handler.emit("missingPermissions", ctx, command, "client", missing);
+          this.#handler.emit(
+            "missingPermissions",
+            ctx,
+            command,
+            "client",
+            missing
+          );
+
           return false;
         }
       } else if (ctx.guild) {
-        const missing = ctx.guild.me.permissionsIn(channel)
+        const missing = ctx.guild.me
+          .permissionsIn(channel)
           .missing(command.permissions.client);
 
         if (missing.length) {
-          this.#handler.emit("missingPermissions", ctx, command, "client", missing);
+          this.#handler.emit(
+            "missingPermissions",
+            ctx,
+            command,
+            "client",
+            missing
+          );
+
           return false;
         }
       }

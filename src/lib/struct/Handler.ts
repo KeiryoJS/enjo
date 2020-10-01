@@ -12,7 +12,9 @@ import { lstatSync, Stats } from "fs";
 import type { Enjo } from "../Client";
 import type { BaseResolvable } from "neocord";
 
-export class ComponentHandler<T extends EnjoComponent = EnjoComponent> extends Emitter {
+export class ComponentHandler<
+  T extends EnjoComponent = EnjoComponent
+> extends Emitter {
   /**
    * The components that were loaded by this handler.
    * @type {Collection}
@@ -66,7 +68,7 @@ export class ComponentHandler<T extends EnjoComponent = EnjoComponent> extends E
     const {
       class: loading = EnjoComponent,
       directory = join(client.directory, name),
-      loadFilter = () => true
+      loadFilter = () => true,
     } = options;
 
     this.class = loading as Class<T>;
@@ -88,7 +90,7 @@ export class ComponentHandler<T extends EnjoComponent = EnjoComponent> extends E
    * @returns {Tuple<string, string[]>[]}
    */
   private static walk(dir: string): Tuple<string, string[]>[] {
-    return walk(dir).map((f) => [ dir, relative(dir, f).split(sep) ]);
+    return walk(dir).map((f) => [dir, relative(dir, f).split(sep)]);
   }
 
   /**
@@ -125,7 +127,8 @@ export class ComponentHandler<T extends EnjoComponent = EnjoComponent> extends E
    * @returns {?EnjoComponent}
    */
   public get(resolvable: ComponentResolvable<T>): T | null {
-    if (typeof resolvable === "string") return this.store.get(resolvable) ?? null;
+    if (typeof resolvable === "string")
+      return this.store.get(resolvable) ?? null;
     else if (resolvable instanceof this.class) return resolvable;
     else if (resolvable.id) return this.store.get(resolvable.id) ?? null;
     return null;
@@ -230,7 +233,9 @@ export class ComponentHandler<T extends EnjoComponent = EnjoComponent> extends E
   }
 }
 
-export type ComponentResolvable<C extends EnjoComponent = EnjoComponent> = BaseResolvable<C>;
+export type ComponentResolvable<
+  C extends EnjoComponent = EnjoComponent
+> = BaseResolvable<C>;
 
 export type LoadFilter = (path: string, stats: Stats) => boolean;
 

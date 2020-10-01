@@ -40,11 +40,12 @@ export class Listener extends EnjoComponent<ListenerOptions> {
    * @type {boolean}
    */
   public get emitter(): EventEmitterLike {
-    return (typeof this.options.emitter === "string"
-      ? this.handler.emitters[this.options.emitter]
-      : this.options.emitter) ?? this.client;
+    return (
+      (typeof this.options.emitter === "string"
+        ? this.handler.emitters[this.options.emitter]
+        : this.options.emitter) ?? this.client
+    );
   }
-
 
   /**
    * Called whenever the provided event is emitted.
@@ -71,7 +72,6 @@ export class Listener extends EnjoComponent<ListenerOptions> {
     this._remove();
     return super.disable();
   }
-
 
   /**
    * Removes the listener from the emitter.

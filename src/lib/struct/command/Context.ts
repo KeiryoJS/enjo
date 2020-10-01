@@ -58,7 +58,6 @@ export class Context {
   public get guild(): Guild | null {
     return this.message.guild;
   }
-
 }
 
 export interface CurrentInvocation {
