@@ -1,8 +1,9 @@
 {
-  "name": "@neocord/enjo",
-  "version": "1.0.0",
+  "name": "enjo",
+  "version": "0.0.0-alpha.1",
   "description": "The official bot framework for the neocord discord library.",
   "main": "dist/index.js",
+  "types": "typings/index.d.ts",
   "repository": "https://github.com/neo-cord/enjo",
   "author": "melike2d",
   "license": "MIT",

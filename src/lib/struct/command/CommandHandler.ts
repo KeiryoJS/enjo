@@ -9,7 +9,7 @@ import { Command, CommandOptions } from "./Command";
 import { CommandDispatcher, DispatcherOptions } from "./CommandDispatcher";
 
 import type { Enjo } from "../../Client";
-import type { Context } from "vm";
+import type { Context } from "./Context";
 
 export class CommandHandler extends ComponentHandler<Command> {
   /**
