@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* Basic */
+    "lib": ["ES2019"],
+    "target": "ES2019",
+    "module": "commonjs",
+    "skipLibCheck": true,
+
+    /* Compiling */
+    "inlineSourceMap": false,
+    "declaration": false,
+    "allowJs": true,
+    "importHelpers": true,
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Strict Options */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "experimentalDecorators": true,
+    "importsNotUsedAsValues": "error",
+
+    /* Types */
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+
+    /* Module Resolution */
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules"]
+}
