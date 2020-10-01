@@ -178,13 +178,14 @@ export class CommandDispatcher {
   ): Promise<boolean> {
     if (!this.client.owners.has(ctx.author)) {
       // (0) Run Rate-limits.
-      const dripRes = await this.ratelimit.drip(ctx.message, command);
-      if (typeof dripRes === "number") {
-        const target = RatelimitController.getRatelimitTarget(
+      const reset = await this.ratelimit.drip(ctx.message, command);
+      if (typeof reset === "number") {
+        const target = RatelimitController.getTarget(
           ctx.message,
-          command.ratelimit
+          command.ratelimit.type
         );
-        this.#handler.emit("ratelimited", ctx, command, dripRes, target);
+
+        this.#handler.emit("ratelimited", ctx, command, reset, target);
         return false;
       }
     }

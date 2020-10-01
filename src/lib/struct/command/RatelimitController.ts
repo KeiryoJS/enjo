@@ -4,29 +4,29 @@
  * See the LICENSE file in the project root for more details.
  */
 
-import { Timers } from "@neocord/utils";
+import { Fn, Timers } from "@neocord/utils";
 import { ChannelType } from "discord-api-types";
 
 import type { Message } from "neocord";
-import type { Command, RatelimitOptions } from "./Command";
+import type { Command, RatelimitType } from "./Command";
 
 export class RatelimitController {
   /**
    * The ratelimit store.
    * @type {WeakMap}
    */
-  public readonly store = new WeakMap<RatelimitKey, RatelimitEntry>();
+  public readonly store = new Map<string, RatelimitEntry>();
 
   /**
    * Returns the ratelimit key according to the ratelimit options.
    * @param {Message} message The message.
-   * @param {RatelimitOptions} options
+   * @param {RatelimitType} type
    */
-  public static getRatelimitTarget(
+  public static getTarget(
     message: Message,
-    options: RatelimitOptions
+    type: RatelimitType
   ): { id: string } {
-    switch (options.type) {
+    switch (type) {
       case "ch":
       case "channel":
         if (message.channel.type === ChannelType.DM) {
@@ -54,51 +54,55 @@ export class RatelimitController {
     message: Message,
     command: Command
   ): Promise<number | true> {
-    const target = RatelimitController.getRatelimitTarget(
-      message,
-      command.ratelimit
-    ).id;
+    const tar = RatelimitController.getTarget(message, command.ratelimit.type)
+      .id;
+    const tout = this._timeout(tar, command.id);
 
-    let entry = this.store.get({ command: command.id, target });
+    let entry = this.store.get(`${tar}-${command.id}`);
     if (!entry) {
       entry = {
-        reset: command.ratelimit.reset as number,
+        reset: command.ratelimit.reset,
         remaining: Number(command.ratelimit.bucket),
+        timeout: Timers.setTimeout(tout, command.ratelimit.reset),
       };
 
-      entry.timeout = Timers.setTimeout(() => {
-        const entry = this.store.get({ command: command.id, target });
-        if (entry && entry.timeout) {
-          Timers.clearTimeout(entry.timeout);
-        }
-
-        this.store.delete({ command: command.id, target });
-      }, entry.reset);
-
-      this.store.set({ target, command: command.id }, entry);
+      this.store.set(`${tar}-${command.id}`, entry);
     }
 
-    --entry.remaining;
-    if (entry.remaining < 0) {
-      if (entry.remaining < -1) {
-        entry.reset += command.ratelimit.reset as number;
-        entry.timeout?.refresh();
+    if (entry.remaining === 0) {
+      if (command.ratelimit.stack) {
+        if (entry.exceeded) {
+          if (entry.timeout) Timers.clearTimeout(entry.timeout);
+          entry.reset += command.ratelimit.reset;
+          entry.timeout = Timers.setTimeout(tout, entry.reset);
+        }
+
+        entry.exceeded = true;
       }
 
       return entry.reset;
     }
 
+    --entry.remaining;
+
     return true;
+  }
+
+  private _timeout(target: string, command: string): Fn {
+    return () => {
+      const entry = this.store.get(`${target}-${command}`);
+      if (entry && entry.timeout) {
+        Timers.clearTimeout(entry.timeout);
+      }
+
+      this.store.delete(`${target}-${command}`);
+    };
   }
 }
 
 export interface RatelimitEntry {
   remaining: number;
   reset: number;
+  exceeded?: true;
   timeout?: NodeJS.Timeout;
-}
-
-export interface RatelimitKey {
-  target: string;
-  command: string;
 }

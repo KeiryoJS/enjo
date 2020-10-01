@@ -792,10 +792,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-neocord@^0.0.0-alpha.6:
-  version "0.0.0-alpha.6"
-  resolved "https://registry.yarnpkg.com/neocord/-/neocord-0.0.0-alpha.6.tgz#94cde209adc468d2ab6d627b67d36b315754eb6c"
-  integrity sha512-0B27+GGEbBLEBrD8tM8dLScYw6DQAKECfi9QvFHr6R7atny7eDyyejQ7mtJ41QPp44i0XZ4Zzf+mb39oMEjawQ==
+neocord@0.0.0-alpha.7:
+  version "0.0.0-alpha.7"
+  resolved "https://registry.yarnpkg.com/neocord/-/neocord-0.0.0-alpha.7.tgz#96b16797dd99622eeb81d5716fe4847fa57d4b08"
+  integrity sha512-5jVaXWy43rC3F+s8ri3Jx/zOp1qPjvfl5mwZTqhQgC8vgpuhq3XMJI9h1FE5Jxl0jIHyORC2RyKFgh0iUh2a5A==
   dependencies:
     "@neocord/gateway" "^1.2.3"
     "@neocord/rest" "^1.2.0"

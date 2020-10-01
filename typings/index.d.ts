@@ -3,7 +3,6 @@
 //   ../@neocord/utils
 //   ../fs
 //
-//   ../vm
 
 import type { Class, Collection, Emitter } from "@neocord/utils";
 import type { Stats } from "fs";
@@ -22,7 +21,7 @@ import type {
   User
 } from "neocord";
 
-declare module "enjo///neocord" {
+declare module "neocord" {
   interface Client {
     handlers: Map<string, ComponentHandler>;
   }
@@ -154,7 +153,7 @@ export class Command extends EnjoComponent<CommandOptions> {
    * The ratelimit options.
    * @type {RatelimitOptions}
    */
-  get ratelimit(): RatelimitOptions;
+  get ratelimit(): Required<RatelimitOptions>;
 
   /**
    * Called whenever one of the triggers is invoked.
@@ -171,6 +170,11 @@ export type RatelimitType = ("ch" | "channel") | ("usr" | "user") | ("g" | "guil
 
 export interface RatelimitOptions {
   /**
+   * Whether to stack the reset cooldown if the target is already limited.
+   * @type {boolean}
+   */
+  readonly stack?: boolean;
+  /**
    * The amount of invokes before getting limited.
    * @type {number}
    * @example
@@ -183,7 +187,7 @@ export interface RatelimitOptions {
    * @example
    * "30s"
    */
-  readonly reset: number | string;
+  readonly reset: number;
   /**
    * The type of ratelimit.
    * Either "user", "guild", or "channel".
@@ -353,6 +357,7 @@ export class CommandDispatcher {
    */
   readonly contexts: Collection<string, Context>;
 
+
   /**
    * @param {CommandHandler} handler The command handler.
    * @param {DispatcherOptions} [options] The dispatcher options.
@@ -398,14 +403,14 @@ export class RatelimitController {
    * The ratelimit store.
    * @type {WeakMap}
    */
-  readonly store: WeakMap<RatelimitKey, RatelimitEntry>;
+  readonly store: Map<string, RatelimitEntry>;
 
   /**
    * Returns the ratelimit key according to the ratelimit options.
    * @param {Message} message The message.
-   * @param {RatelimitOptions} options
+   * @param {RatelimitType} type
    */
-  static getRatelimitTarget(message: Message, options: RatelimitOptions): {
+  static getTarget(message: Message, type: RatelimitType): {
     id: string;
   };
 
@@ -421,12 +426,8 @@ export class RatelimitController {
 export interface RatelimitEntry {
   remaining: number;
   reset: number;
+  exceeded?: true;
   timeout?: NodeJS.Timeout;
-}
-
-export interface RatelimitKey {
-  target: string;
-  command: string;
 }
 
 export class Context {

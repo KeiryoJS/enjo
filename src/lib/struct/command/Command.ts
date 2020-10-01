@@ -11,12 +11,13 @@ import type { PermissionResolvable } from "neocord";
 import type { Context } from "./Context";
 import type { Enjo } from "../../Client";
 
-const RATELIMIT_REGEXP = /^(?:((?:ch(?:annel)?|use?r|guild)):)?(\d+)\/(\d+)(m?s?|h|w)$/gm;
+const RATELIMIT_REGEXP = /^(?:((?:ch(?:annel)?|use?r|g(?:uild)?)):)?(\d+)\/(\d+)(m?s?|h|w)(\+)?$/gim;
 
-const RATELIMIT_DEFAULTS: RatelimitOptions = {
+const RATELIMIT_DEFAULTS: Required<RatelimitOptions> = {
   reset: 5000,
   bucket: 1,
   type: "user",
+  stack: true,
 };
 
 const PERMISSION_DEFAULTS: CommandPermissions = {
@@ -29,7 +30,7 @@ const PERMISSION_DEFAULTS: CommandPermissions = {
 const COMMAND_DEFAULTS = {
   typing: true,
   triggers: [],
-  ratelimit: "user:1/5s",
+  ratelimit: "usr:1/5s+",
   enabled: true,
   description: "No description provided.",
   permissions: PERMISSION_DEFAULTS,
@@ -83,16 +84,17 @@ export class Command extends EnjoComponent<CommandOptions> {
    * The ratelimit options.
    * @type {RatelimitOptions}
    */
-  public get ratelimit(): RatelimitOptions {
+  public get ratelimit(): Required<RatelimitOptions> {
     if (typeof this.options.ratelimit === "string") {
       const r = RATELIMIT_REGEXP.exec(this.options.ratelimit);
       if (!r) return RATELIMIT_DEFAULTS;
 
-      const [, type, bucket, reset, unit] = r;
+      const [, type, bucket, reset, unit, stack] = r;
       return {
         bucket: +(bucket ?? 1),
         type: type as RatelimitType,
         reset: unit ? Duration.parse(`${reset}${unit}`) : +(reset ?? 5000),
+        stack: !!stack,
       };
     }
 
@@ -124,6 +126,12 @@ export type RatelimitType =
 
 export interface RatelimitOptions {
   /**
+   * Whether to stack the reset cooldown if the target is already limited.
+   * @type {boolean}
+   */
+  readonly stack?: boolean;
+
+  /**
    * The amount of invokes before getting limited.
    * @type {number}
    * @example
@@ -137,7 +145,7 @@ export interface RatelimitOptions {
    * @example
    * "30s"
    */
-  readonly reset: number | string;
+  readonly reset: number;
 
   /**
    * The type of ratelimit.
